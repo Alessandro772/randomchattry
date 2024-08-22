@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chatly-Try</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="sidebar">
+      <div id="logo">Chatly</div>
+      <input id="search-input" type="text" placeholder="Search..." />
+      <ul id="contacts">
+        <li class="contact">Contact 1</li>
+        <li class="contact">Contact 2</li>
+        <li class="contact">Contact 3</li>
+      </ul>
+    </div>
+    <div id="chat-container">
+      <div id="header">
+        <h1>Chatly</h1>
+      </div>
+      <div id="messages"></div>
+      <div id="input-container">
+        <input id="message-input" type="text" placeholder="Type a message..." />
+        <button id="send-button">Send</button>
+        <button id="skip-button">Skip</button>
+      </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="client.js"></script>
+  </body>
+</html>

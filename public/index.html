@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat App</title>
+    <link rel="stylesheet" href="access.css" />
+  </head>
+  <body>
+    <!-- Header -->
+    <header>
+      <div id="logo-container">
+        <img src="Logo.png" alt="Logo" id="logo" />
+        <h1 id="site-name">Chatly</h1>
+      </div>
+      <div id="toggle-nsfw">
+        <button id="nsfw-button">NSFW Mode</button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+      <h2 id="explore-title">Start exploring</h2>
+      <div id="buttons-container">
+        <button class="explore-button" id="text-chat">Text</button>
+        <button class="explore-button" id="video-chat">Video</button>
+      </div>
+
+      <div id="interest-container">
+        <p>You are interested in:</p>
+        <input
+          type="text"
+          placeholder="Enter interests (e.g., bored, friends, gaming...)"
+        />
+        <div id="toggle-common">
+          <label for="common-interests">Common interests only</label>
+          <input type="checkbox" id="common-interests" />
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <p>
+        Welcome to Chat App, the ever-changing platform for meeting new people!
+      </p>
+    </footer>
+    <script src="access.js"></script>
+  </body>
+</html>
