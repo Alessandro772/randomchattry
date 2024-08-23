@@ -337,4 +337,5 @@ server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 **Purpose**: Starts the server on the specified port.<br>
 **How It Works**: Uses the environment variable `PORT` or defaults to 3000. Listens for incoming connections and logs a message when the server is ready.
+
 ---
