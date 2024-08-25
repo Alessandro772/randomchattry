@@ -18,7 +18,7 @@ io.on("connection", (socket) => {
 
   socket.on("message", (msg) => {
     if (socket.partner) {
-      socket.partner.emit("message", msg.text);
+      socket.partner.emit("message", msg);
     }
   });
 
@@ -54,7 +54,6 @@ io.on("connection", (socket) => {
 function matchUser(socket) {
   if (waitingUsers.length > 0) {
     let partner = waitingUsers.pop();
-    // Ensure the partner is not the same user
     if (partner === socket) {
       waitingUsers.push(partner);
       socket.emit("noPartner");
