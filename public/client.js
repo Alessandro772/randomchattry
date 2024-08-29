@@ -39,6 +39,8 @@ socket.on("message", (msg) => {
     displayImage(msg.content, "theirs");
   } else if (msg.type === "video") {
     displayVideo(msg.content, "theirs");
+  } else if (msg.type === "system") {
+    displayMessage(msg.content, "system");
   } else {
     displayMessage(msg.content, "theirs");
   }

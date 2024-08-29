@@ -1,6 +1,8 @@
 const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
+const axios = require("axios");
+const FormData = require("form-data");
 
 const app = express();
 const server = http.createServer(app);
@@ -18,7 +20,29 @@ io.on("connection", (socket) => {
 
   socket.on("message", (msg) => {
     if (socket.partner) {
-      socket.partner.emit("message", msg);
+      if (msg.type === "image") {
+        checkNSFW(msg.content)
+          .then((isNSFW) => {
+            if (!isNSFW) {
+              socket.partner.emit("message", msg);
+            } else {
+              socket.emit("message", {
+                type: "system",
+                content:
+                  "The image you tried to send was flagged as NSFW and was not delivered.",
+              });
+            }
+          })
+          .catch((err) => {
+            console.error("NSFW check failed:", err);
+            socket.emit("message", {
+              type: "system",
+              content: "There was an error. Please try again.",
+            });
+          });
+      } else {
+        socket.partner.emit("message", msg);
+      }
     }
   });
 
@@ -67,6 +91,27 @@ function matchUser(socket) {
     waitingUsers.push(socket);
     socket.emit("noPartner");
   }
+}
+
+// NSFW content filtering feature
+function checkNSFW(imageBase64) {
+  const buffer = Buffer.from(imageBase64.split(",")[1], "base64");
+  const formData = new FormData();
+  formData.append("image", buffer, "image.jpg");
+
+  return axios
+    .post("http://localhost:5000/check_nsfw", formData, {
+      headers: {
+        ...formData.getHeaders(),
+      },
+    })
+    .then((response) => {
+      return response.data.nsfw === 1;
+    })
+    .catch((error) => {
+      console.error("Error in NSFW request:", error);
+      throw error;
+    });
 }
 
 const PORT = process.env.PORT || 3000;
