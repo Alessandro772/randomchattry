@@ -1,7 +1,7 @@
 
 # Random Chat Test
 
-This document provides an in-depth explanation of the `client.js` and `server.js` files for the chat application. It covers the functionality, purpose, and design of the code, highlighting how the client and server interact.
+This document provides an in-depth explanation of the `client.js`, `server.js` and `nsfw.py` files for the chat application.
 
 ---
 - [Introduction](#introduction)
@@ -20,6 +20,11 @@ This document provides an in-depth explanation of the `client.js` and `server.js
   - [Socket.IO Event Handlers](#socketio-event-handlers)
   - [Partner Functions](#partner-functions)
   - [Server Start](#server-start)
+- [Nsfw.py](#nsfwpy)
+  - [Initialization](#initialization-2)
+  - [Route](#route-for-checking-nsfw-images)
+  - [Flask](#flask-application-runner)
+  
 ## client.js
 
 `client.js` handles the client-side functionality of the chat application. It manages user interactions, DOM updates, and communication with the server through WebSocket events.
@@ -338,7 +343,77 @@ server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 **Purpose**: Starts the server on the specified port.<br>
 **How It Works**: Uses the environment variable `PORT` or defaults to 3000. Listens for incoming connections and logs a message when the server is ready.
 
-**pip install tensorflow==2.13.0**<br>
-**pip install keras==2.13.1**
+## nsfw.py
+
+`nsfw.py` is a Flask-based application designed to check whether uploaded images contain NSFW content. It uses the `opennsfw2` library for image classification.
+
+### Initialization
+
+```python
+
+from flask import Flask, request, jsonify
+import opennsfw2 as n2
+import os
+
+app = Flask(__name__)
+
+```
+
+<p><strong>Purpose</strong>: Sets up the Flask application and imports necessary libraries.<br>
+<strong>How It Works</strong>:
+<ul>
+<li><code>Flask</code>: Initializes the Flask application.</li>
+<li><code>opennsfw2</code>: Imports the NSFW classification model.</li>
+<li><code>os</code>: Handles file system operations, such as saving and deleting files.</li>
+</ul></p>
+
+### Route for Checking NSFW Images
+
+```python
+
+# Route for checking NSFW images
+@app.route('/check_nsfw', methods=['POST'])
+def check_nsfw():
+    if 'image' not in request.files:
+        return jsonify({"error": "No image part"}), 400
+    image_file = request.files['image']
+    if image_file.filename == '':
+        return jsonify({"error": "No selected image"}), 400
+    temp_path = os.path.join('temp', image_file.filename)
+    image_file.save(temp_path)
+    check = round(n2.predict_image(temp_path))
+    os.remove(temp_path)
+    result = 1 if check > 0 else 0
+    return jsonify({"nsfw": result})
+
+```
+
+<p><strong>Purpose</strong>: Defines an endpoint to upload an image and check if it contains NSFW content.<br>
+<strong>How It Works</strong>:
+<ul>
+<li><code>@app.route('/check_nsfw', methods=['POST'])</code>: Specifies the route and method for the image check endpoint.</li>
+<li>Checks if an image file is present in the request and if a file is selected.</li>
+<li>Saves the image temporarily to the <code>temp</code> directory.</li>
+<li>Uses the <code>opennsfw2</code> library to predict if the image is NSFW.</li>
+<li>Deletes the temporary image file after processing.</li>
+<li>Returns a JSON response indicating whether the image is NSFW (1) or not (0).</li>
+</ul></p>
+
+### Flask Application Runner
+
+```python
+# Run the Flask application
+if __name__ == '__main__':
+    if not os.path.exists('temp'):
+        os.makedirs('temp')
+    app.run(debug=True)
+```
+
+<p><strong>Purpose</strong>: Runs the Flask application and sets up the necessary directory for temporary files.<br>
+<strong>How It Works</strong>:
+<ul>
+<li>Checks if the <code>temp</code> directory exists and creates it if not.</li>
+<li>Starts the Flask server in debug mode, allowing you to see detailed error messages and automatically reload the server on code changes.</li>
+</ul></p>
 
 ---
