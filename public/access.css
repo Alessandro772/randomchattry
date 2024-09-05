@@ -1,4 +1,3 @@
-/* Stile globale */
 body {
   font-family: "Poppins", sans-serif;
   margin: 0;
@@ -8,46 +7,43 @@ body {
   overflow-x: hidden;
 }
 
-/* Header principale */
 .main-header {
   display: flex;
-  justify-content: space-between; /* Sposta il logo e la barra di navigazione ai lati opposti */
+  justify-content: space-between;
   align-items: center;
-  padding: 10px 20px; /* Riduci il padding se necessario */
+  padding: 10px 20px;
   background-color: #ffffff;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   position: fixed;
   width: 100%;
-  max-height: 80px; /* Imposta un'altezza massima fissa per il header */
+  max-height: 80px;
   z-index: 1000;
-  box-sizing: border-box; /* Include padding e bordo nella larghezza totale */
-  overflow: hidden; /* Nasconde il contenuto che eccede il contenitore */
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
-/* Logo */
 .logo {
-  flex: 0 0 auto; /* Mantiene la dimensione del logo fissa */
+  flex: 0 0 auto;
 }
 
 .logo img {
-  width: 80px; /* Imposta una larghezza fissa per il logo */
-  height: auto; /* Mantiene le proporzioni dell'immagine */
-  max-width: 100%; /* Assicura che il logo non superi il contenitore */
+  width: 80px;
+  height: auto;
+  max-width: 100%;
 }
 
-/* Navigazione principale */
 .main-nav {
-  flex: 1; /* Occupa lo spazio rimanente */
+  flex: 1;
   display: flex;
-  justify-content: flex-end; /* Allinea i link a destra */
-  align-items: center; /* Centra verticalmente gli elementi */
-  height: 100%; /* Assicura che la nav occupi tutta l'altezza dell'header */
+  justify-content: flex-end;
+  align-items: center;
+  height: 100%;
 }
 
 .main-nav ul {
   list-style: none;
   display: flex;
-  gap: 20px; /* Riduci il gap se necessario */
+  gap: 20px;
   margin: 0;
   padding: 0;
 }
@@ -67,7 +63,6 @@ body {
   color: #4a90e2;
 }
 
-/* Hero Section con Gradient e Video di Sfondo */
 .hero {
   position: relative;
   height: 100vh;
@@ -178,7 +173,6 @@ body {
   font-size: 0.9em;
 }
 
-/* Sezione Informazioni */
 .features {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -206,7 +200,6 @@ body {
   color: #4a90e2;
 }
 
-/* Sezione Avvertenze Chat */
 .warning-section {
   background-color: #ffffff;
   padding: 60px 80px;
@@ -234,7 +227,6 @@ body {
   line-height: 1.6;
 }
 
-/* Footer */
 footer {
   background-color: #333;
   color: white;
@@ -267,7 +259,6 @@ footer {
   color: #4a90e2;
 }
 
-/* Sezione Lingua */
 .language-section {
   margin-top: 30px;
   display: flex;
