@@ -18,13 +18,14 @@ messages.appendChild(typingIndicator);
 
 // State variables
 let typingTimeout;
-let isSearchingForPartner = false; // Tracks whether the user is currently searching for a chat partner
+let isSearchingForPartner = false;
 
 // Event listeners
 sendButton.addEventListener("click", sendMessage);
 skipButton.addEventListener("click", skipPartner);
 uploadButton.addEventListener("click", () => fileInput.click());
 fileInput.addEventListener("change", handleFileUpload);
+
 messageInput.addEventListener("keypress", (e) => {
   if (e.key === "Enter") {
     sendMessage();
@@ -36,7 +37,7 @@ messageInput.addEventListener("keypress", (e) => {
 // Socket event handlers
 socket.on("message", (msg) => {
   if (msg.type === "image") {
-    displayImage(msg.content, "theirs");
+    displayImage(msg.content, "theirs", msg.nsfw);
   } else if (msg.type === "video") {
     displayVideo(msg.content, "theirs");
   } else if (msg.type === "system") {
@@ -48,32 +49,26 @@ socket.on("message", (msg) => {
 });
 
 socket.on("partnerFound", () => {
-  clearChat(); // Clears the chat window
-  displayMessage(
-    "Oh, we’ve found a new buddy for you. Start chatting with them!",
-    "system"
-  );
+  clearChat();
+  displayMessage("New partner found! Start chatting", "system");
   hideTypingIndicator();
-  isSearchingForPartner = false; // Reset the state
-  messageInput.placeholder = "Type a message..."; // Rsestore the input placeholder
+  isSearchingForPartner = false;
+  messageInput.placeholder = "Type a message...";
 });
 
 socket.on("partnerDisconnected", () => {
-  displayMessage("Oops, your buddy has left you.", "system");
+  displayMessage("Your partner has left", "system");
   hideTypingIndicator();
   skipPartner();
-  isSearchingForPartner = true; // Update the state to "searching"
-  messageInput.placeholder = "Wait for a new partner"; // Update the input placeholder
+  isSearchingForPartner = true;
+  messageInput.placeholder = "Wait for a new partner";
 });
 
 socket.on("noPartner", () => {
-  displayMessage(
-    "There are no new buddies available right now. Please wait for someone to connect...",
-    "system"
-  );
+  displayMessage("No partners available. Please wait", "system");
   hideTypingIndicator();
-  isSearchingForPartner = true; // Update the state to "searching"
-  messageInput.placeholder = "Wait for a new partner"; // Update the input placeholder
+  isSearchingForPartner = true;
+  messageInput.placeholder = "Wait for a new partner";
 });
 
 socket.on("typing", () => {
@@ -91,19 +86,19 @@ function sendMessage() {
     if (msg) {
       socket.emit("message", { type: "text", content: msg });
       displayMessage(msg, "mine");
-      messageInput.value = ""; // Clear the input field
+      messageInput.value = "";
       hideTypingIndicator();
     }
   }
 }
 
-// Function file upload
+// Function to handle file upload
 function handleFileUpload(event) {
   const file = event.target.files[0];
   if (file) {
-    const maxSize = 5 * 1024 * 1024;
+    const maxSize = 50 * 1024 * 1024;
     if (file.size > maxSize) {
-      alert("File is too large. Maximum size is 5MB.");
+      alert("File is too large. Maximum size is 50MB.");
       return;
     }
 
@@ -134,27 +129,71 @@ function skipPartner() {
 function displayMessage(msg, type) {
   const div = document.createElement("div");
   div.classList.add("message");
+
   if (type === "mine") {
     div.classList.add("mine");
     div.textContent = `You: ${msg}`;
   } else if (type === "theirs") {
     div.classList.add("theirs");
     div.textContent = msg;
-  } else {
+  } else if (type === "system") {
     div.classList.add("system");
-    div.textContent = msg;
+
+    // Create a close button
+    const closeButton = document.createElement("div");
+    closeButton.classList.add("close-btn");
+    closeButton.innerHTML = "&times;";
+    closeButton.addEventListener("click", () => div.remove());
+
+    // Add an icon
+    const icon = document.createElement("span");
+    icon.classList.add("icon");
+    icon.innerHTML = "🔔";
+
+    // Append the icon, message, and close button to the div
+    div.appendChild(icon);
+    div.appendChild(document.createTextNode(msg));
+    div.appendChild(closeButton);
   }
+
   messages.insertBefore(div, typingIndicator);
   messages.scrollTop = messages.scrollHeight;
 }
 
 // Function to display an image in the chat
-function displayImage(base64, type) {
+function displayImage(base64, type, isNSFW = false) {
   const div = document.createElement("div");
   div.classList.add("message", type === "mine" ? "mine" : "theirs");
+
   const img = document.createElement("img");
   img.src = base64;
   img.style.maxWidth = "200px";
+  img.style.cursor = "pointer";
+
+  if (isNSFW) {
+    img.classList.add("nsfw-image");
+    img.title = "Click to view";
+
+    // Create an overlay for NSFW images
+    const overlay = document.createElement("div");
+    overlay.classList.add("nsfw-overlay");
+    overlay.innerHTML = `
+      <span class="eye-icon">👁️</span>
+      <span class="nsfw-text">Explicit content. Click to view.</span>
+    `;
+
+    // Click event to remove blur and overlay
+    img.addEventListener("click", () => {
+      img.classList.remove("nsfw-image");
+      overlay.style.display = "none";
+    });
+
+    div.style.position = "relative";
+    div.appendChild(overlay);
+  } else {
+    img.addEventListener("click", () => openImagePreview(base64));
+  }
+
   div.appendChild(img);
   messages.insertBefore(div, typingIndicator);
   messages.scrollTop = messages.scrollHeight;
@@ -164,14 +203,35 @@ function displayImage(base64, type) {
 function displayVideo(base64, type) {
   const div = document.createElement("div");
   div.classList.add("message", type === "mine" ? "mine" : "theirs");
+
   const video = document.createElement("video");
   video.src = base64;
   video.controls = true;
   video.style.maxWidth = "200px";
+
   div.appendChild(video);
   messages.insertBefore(div, typingIndicator);
-  messages.scrollTop = messages.scrollHeight; // Auto-scroll to the bottom
+  messages.scrollTop = messages.scrollHeight;
 }
+
+// Function to open the image preview
+function openImagePreview(src) {
+  const previewContainer = document.getElementById("image-preview-container");
+  const previewImage = previewContainer.querySelector("img");
+  previewImage.src = src;
+  previewContainer.style.display = "flex";
+}
+
+// Function to close the image preview
+function closeImagePreview() {
+  const previewContainer = document.getElementById("image-preview-container");
+  previewContainer.style.display = "none";
+}
+
+// Event listener to close the image preview
+document
+  .querySelector("#image-preview-container .close-btn")
+  .addEventListener("click", closeImagePreview);
 
 // Function to show the typing indicator
 function showTypingIndicator() {

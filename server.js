@@ -26,10 +26,10 @@ io.on("connection", (socket) => {
             if (!isNSFW) {
               socket.partner.emit("message", msg);
             } else {
-              socket.emit("message", {
-                type: "system",
-                content:
-                  "The image you tried to send was flagged as NSFW and was not delivered.",
+              socket.partner.emit("message", {
+                type: "image",
+                content: msg.content,
+                nsfw: true,
               });
             }
           })
