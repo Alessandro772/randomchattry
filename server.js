@@ -106,7 +106,7 @@ function checkNSFW(imageBase64) {
   formData.append("image", buffer, "image.jpg");
 
   return axios
-    .post("http://localhost:5000/check_nsfw", formData, {
+    .post("http://0.0.0.0:5000/check_nsfw", formData, {
       headers: {
         ...formData.getHeaders(),
       },
