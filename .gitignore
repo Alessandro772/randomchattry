@@ -36,7 +36,6 @@ poetry.lock
 
 node_modules/
 
-requirements.txt
 
 
 .env
