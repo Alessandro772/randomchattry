@@ -6,7 +6,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "concurrently \"npm run start-node\" \"npm run start-python\"",
     "start-node": "node server.js",
-    "start-python": "pip install -r requirements.txt && python nsfw.py"
+    "start-python": "python3 -m venv venv && . venv/bin/activate && pip install -r requirements.txt && python nsfw.py"
   },
   "keywords": [],
   "author": "",
