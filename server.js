@@ -7,11 +7,9 @@ const FormData = require("form-data");
 const app = express();
 const server = http.createServer(app);
 
+// Configure Socket.IO with increased maxHttpBufferSize
 const io = new Server(server, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"],
-  },
+  maxHttpBufferSize: 1e8, // 100 MB
 });
 
 app.use(express.static("public"));
@@ -106,7 +104,7 @@ function checkNSFW(imageBase64) {
   formData.append("image", buffer, "image.jpg");
 
   return axios
-    .post("http://0.0.0.0:5000/check_nsfw", formData, {
+    .post("http://127.0.0.1:5000/check_nsfw", formData, {
       headers: {
         ...formData.getHeaders(),
       },
