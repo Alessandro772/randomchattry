@@ -1,12 +1,19 @@
 const express = require("express");
 const http = require("http");
-const socketIo = require("socket.io");
+const { Server } = require("socket.io");
 const axios = require("axios");
 const FormData = require("form-data");
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+
+// Configura il supporto per CORS
+const io = new Server(server, {
+  cors: {
+    origin: "*", // Sostituisci con l'URL del tuo frontend se necessario
+    methods: ["GET", "POST"],
+  },
+});
 
 app.use(express.static("public"));
 
@@ -95,6 +102,7 @@ function matchUser(socket) {
 
 // NSFW content filtering feature
 function checkNSFW(imageBase64) {
+  // Commenta o aggiorna con un endpoint NSFW esterno se disponibile
   const buffer = Buffer.from(imageBase64.split(",")[1], "base64");
   const formData = new FormData();
   formData.append("image", buffer, "image.jpg");
@@ -114,5 +122,6 @@ function checkNSFW(imageBase64) {
     });
 }
 
+// Utilizzo della porta da variabile di ambiente
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
