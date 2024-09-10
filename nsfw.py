@@ -4,7 +4,6 @@ import os
 
 app = Flask(__name__)
 
-
 # Route for checking NSFW images
 @app.route('/check_nsfw', methods=['POST'])
 def check_nsfw():
@@ -20,10 +19,12 @@ def check_nsfw():
     result = 1 if check > 0 else 0
     return jsonify({"nsfw": result})
 
-
 # Run the Flask application
 if __name__ == '__main__':
+    # Creare la cartella 'temp' se non esiste
     if not os.path.exists('temp'):
         os.makedirs('temp')
-    app.run(host='0.0.0.0', port=5000)
 
+    # Utilizza la porta assegnata da Render tramite la variabile d'ambiente `PORT`
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
