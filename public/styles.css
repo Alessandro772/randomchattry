@@ -375,6 +375,11 @@ button i {
   font-size: 12px;
 }
 
+#chat-container.highlight {
+  border: 3px dashed #4caf50; /* Cambia il bordo */
+  transition: background-color 0.3s, border 0.3s;
+}
+
 @keyframes message-in {
   from {
     opacity: 0;

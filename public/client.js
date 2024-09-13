@@ -34,6 +34,70 @@ messageInput.addEventListener("keypress", (e) => {
   }
 });
 
+// Upload Files and Drag and Drop
+const chatContainer = document.getElementById("chat-container");
+
+["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+  chatContainer.addEventListener(eventName, preventDefaults, false);
+});
+
+function preventDefaults(e) {
+  e.preventDefault();
+  e.stopPropagation();
+}
+
+["dragenter", "dragover"].forEach((eventName) => {
+  chatContainer.addEventListener(
+    eventName,
+    () => chatContainer.classList.add("highlight"),
+    false
+  );
+});
+
+["dragleave", "drop"].forEach((eventName) => {
+  chatContainer.addEventListener(
+    eventName,
+    () => chatContainer.classList.remove("highlight"),
+    false
+  );
+});
+
+chatContainer.addEventListener("drop", handleDrop, false);
+
+function handleDrop(e) {
+  const dt = e.dataTransfer;
+  const files = dt.files;
+  handleFiles(files);
+}
+
+function handleFiles(files) {
+  [...files].forEach(uploadFile);
+}
+
+function uploadFile(file) {
+  const maxSize = 50 * 1024 * 1024;
+  if (file.size > maxSize) {
+    alert("File is too large. Maximum size is 50MB.");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function () {
+    const base64 = reader.result;
+    if (file.type.startsWith("image/")) {
+      socket.emit("message", { type: "image", content: base64 });
+      displayImage(base64, "mine");
+    } else if (file.type.startsWith("video/")) {
+      socket.emit("message", { type: "video", content: base64 });
+      displayVideo(base64, "mine");
+    }
+  };
+  reader.onerror = function () {
+    console.error("Error reading file:", reader.error);
+  };
+  reader.readAsDataURL(file);
+}
+
 // Socket event handlers
 socket.on("message", (msg) => {
   if (msg.type === "image") {
@@ -92,31 +156,11 @@ function sendMessage() {
   }
 }
 
-// Function to handle file upload
+// Function to handle file upload via input
 function handleFileUpload(event) {
   const file = event.target.files[0];
   if (file) {
-    const maxSize = 50 * 1024 * 1024;
-    if (file.size > maxSize) {
-      alert("File is too large. Maximum size is 50MB.");
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = function () {
-      const base64 = reader.result;
-      if (file.type.startsWith("image/")) {
-        socket.emit("message", { type: "image", content: base64 });
-        displayImage(base64, "mine");
-      } else if (file.type.startsWith("video/")) {
-        socket.emit("message", { type: "video", content: base64 });
-        displayVideo(base64, "mine");
-      }
-    };
-    reader.onerror = function () {
-      console.error("Error reading file:", reader.error);
-    };
-    reader.readAsDataURL(file);
+    uploadFile(file);
   }
 }
 
@@ -145,12 +189,10 @@ function displayMessage(msg, type) {
     closeButton.innerHTML = "&times;";
     closeButton.addEventListener("click", () => div.remove());
 
-    // Add an icon
     const icon = document.createElement("span");
     icon.classList.add("icon");
     icon.innerHTML = "🔔";
 
-    // Append the icon, message, and close button to the div
     div.appendChild(icon);
     div.appendChild(document.createTextNode(msg));
     div.appendChild(closeButton);
