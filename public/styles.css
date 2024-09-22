@@ -376,7 +376,7 @@ button i {
 }
 
 #chat-container.highlight {
-  border: 3px dashed #4caf50; /* Cambia il bordo */
+  border: 3px dashed #4caf50;
   transition: background-color 0.3s, border 0.3s;
 }
 

@@ -34,7 +34,7 @@ messageInput.addEventListener("keypress", (e) => {
   }
 });
 
-// Upload Files and Drag and Drop
+// Upload Files and Drag & Drop
 const chatContainer = document.getElementById("chat-container");
 
 ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
